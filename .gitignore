@@ -1,0 +1,11 @@
+*.o
+.dep
+.cproject
+.settings
+.project
+SNMain
+edgeMain
+*.d
+bulk
+onOff
+random

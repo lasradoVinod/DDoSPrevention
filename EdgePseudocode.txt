@@ -1,0 +1,48 @@
+Assumptions and Limitations:
+	Shadownet is trained with average value
+
+Register with SN (my IP)
+
+Get InitialAverage and Sample Duration and Sampling period and threashold for that locality.
+
+InitProcess:
+
+Spawn a thread Process for each port:
+
+###############Functions###############
+InitProcess:
+		calculate filter parameter alpha
+
+Process:
+	listen()
+	thread = []
+	start ThreadTermination(thread)
+	while true:
+		connection = accept()
+		//new thread to for each connection
+		thread(connection)
+		if (mapOfIp[connection.sourceIP] exists):
+			check permission
+
+		/*Further stat collection out of critical path*/
+		if permission is allowed:
+			ConnectionStartTime = getTime()
+			connThread = thread.Run()
+		else
+			connection.close()
+		
+		if (map[connection.sourceIP] exists):
+			/*Question Regarding this: Destination IP is the edge. Edge decides which cloud to send to or not. If thing hacked it will not come to edge. */
+			map[connection.sourceIP].destinationIP.append(destination)
+			map[connection.sourceIP].numConnection ++
+			/*Other stats*/
+
+ThreadTermination:
+while thread in threads:
+if connThread = TERMINATED:
+	map[connection.sourceIP].connectionTime =  getTime() - ConnectionStartTime
+
+Run:
+	p = getPacket()
+	sendTo(NextStage)
+	p.getSize()

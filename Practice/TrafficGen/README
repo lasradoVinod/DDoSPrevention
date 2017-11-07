@@ -1,0 +1,9 @@
+Commands to build:
+
+i. make all to build all
+ii. make sink to build packet sink.
+iii. make bulk to build bulkSender
+iv. make onOff to build OnOff.
+v. make random to build randomSend
+
+make clean cleans all
