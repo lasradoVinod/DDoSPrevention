@@ -1,4 +1,4 @@
-/*This file declares the functions for Edge*/
+	/*This file declares the functions for Edge*/
 #include "AlgoUtils.h"
 #include "MessageHelper.h"
 #include <string>
@@ -79,10 +79,8 @@ private:
 	void sendSample();
 
 	average_t datarateAverage;
-  uint16_t port;
+  	uint16_t port;
 	ClientSocketUdp * c_sock;
-	MessageCreator msgCreator;
-	MessageParser msgParser;
 	uint32_t myEdgeNum;
 	SamplingParams sampleParams;
 	EdgeConfigParams edgeParams;

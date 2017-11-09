@@ -34,7 +34,7 @@ class SocketUdp
   
   bool send ( const unsigned char * msg, int size) const;
 
-  int recv ( unsigned char * buf, int buffSize ) const;
+  int recv ( unsigned char * s , int size, std::string & ip, uint16_t &port ) const;
 
   void set_non_blocking ( const bool );
 

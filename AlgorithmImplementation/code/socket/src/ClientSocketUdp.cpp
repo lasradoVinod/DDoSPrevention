@@ -50,10 +50,10 @@ const void ClientSocketUdp::send ( const unsigned char * s, int size )
 }
 
 
-const int ClientSocketUdp::recv ( unsigned char * s , int size ) 
+const int ClientSocketUdp::recv ( unsigned char * s , int size, std::string & ip, uint16_t &port) 
 {
   int readSize;
-  readSize = SocketUdp::recv ( s,size );    
+  readSize = SocketUdp::recv ( s,size,ip,port );    
   return readSize;
 }
 

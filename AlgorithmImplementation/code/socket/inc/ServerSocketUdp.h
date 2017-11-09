@@ -17,7 +17,7 @@ class ServerSocketUdp : private SocketUdp
   const ServerSocketUdp& operator >> ( std::string& ) const;
 
   const void send ( const unsigned char * s, int size ) ;
-  const int recv ( unsigned char * s , int size ) ;
+  const int recv (unsigned char * s , int size, std::string & ip, uint16_t &port) ;
 
   void accept ( ServerSocketUdp& );
 

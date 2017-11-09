@@ -31,7 +31,6 @@ const ServerSocketUdp& ServerSocketUdp::operator << ( const std::string& s ) con
     }
 
   return *this;
-
 }
 
 
@@ -54,15 +53,13 @@ const void ServerSocketUdp::send ( const unsigned char * s, int size )
 }
 
 
-const int ServerSocketUdp::recv ( unsigned char * s , int size ) 
+const int ServerSocketUdp::recv ( unsigned char * s , int size, std::string & ip, uint16_t &port) 
 {
   int readSize;
-  if ( (readSize = SocketUdp::recv ( s,size )) )
+  if ( (readSize = SocketUdp::recv ( s,size,ip,port )) )
     {
       throw Exception ( "Could not read from socket.",2 );
     }
 
   return readSize;
 }
-
-/*TODO: Accept function will be required to get the destination address*/

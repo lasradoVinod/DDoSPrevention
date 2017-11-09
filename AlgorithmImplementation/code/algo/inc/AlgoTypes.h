@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 #include <netinet/in.h>
+#include <sys/time.h>
+
+typedef struct timeval timeval;  
 /*Beta is the threashold value*/
 typedef float beta_t;
 
@@ -19,6 +22,7 @@ typedef struct __attribute__((packed)) __EdgeConfigParams
 {
   /*This detemined the time above threshold after which alarm is sounded*/
   uint32_t burstySampleTime;
+  /*Threshold for input data rate*/
   beta_t threasholdInput;
   average_t initialAvergeInput;
   /*Currently we are implementing only for input average*/

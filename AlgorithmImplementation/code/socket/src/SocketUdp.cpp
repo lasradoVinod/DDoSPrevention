@@ -89,12 +89,12 @@ int SocketUdp::recv ( std::string& s ) const
 
   socklen_t lenStruct = sizeof (struct sockaddr_in);
   char buf [ MAXRECV_UDP + 1 ];
-
+  sockaddr_in tempAddr;
   s = "";
 
   memset ( buf, 0, MAXRECV_UDP + 1 );
 
-  int status = (int)::recvfrom ( m_sock, buf, MAXRECV_UDP, 0,  (struct sockaddr *)&m_addr, &lenStruct);
+  int status = (int)::recvfrom ( m_sock, buf, MAXRECV_UDP, 0,  (struct sockaddr *)&tempAddr, &lenStruct);
 
   if ( status == -1 )
     {
@@ -127,13 +127,17 @@ bool SocketUdp::send ( const unsigned char * msg, int size) const
     }
 }
 
-int SocketUdp::recv ( unsigned char * buf, int buffSize ) const
+int SocketUdp::recv ( unsigned char * buf , int buffSize, std::string & ip, uint16_t &port) const
 {
   socklen_t lenStruct = sizeof (struct sockaddr_in);
   memset ( buf, 0, buffSize );
+  sockaddr_in tempAddr;
 
-  int status = (int)::recvfrom ( m_sock, buf, buffSize, 0, (struct sockaddr *)&m_addr, &lenStruct );
+  int status = (int)::recvfrom (m_sock,buf,buffSize,0,(struct sockaddr *)&tempAddr, &lenStruct );
 
+  port = ntohs(tempAddr.sin_port);
+  ip = inet_ntoa(tempAddr.sin_addr);
+  
   if ( status == -1 )
     {
       std::cout << "status == -1   errno == " << errno << "  in SocketUdp::recv\n";

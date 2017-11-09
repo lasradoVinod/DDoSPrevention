@@ -33,8 +33,8 @@ Edge::Edge(uint16_t pt)
 
 void Edge::initEdge()
 {
-  /*Connect with ShandowNet*/
   /*Get current params*/
+  
   /*Start thread with timer management functions
    * */
   /*TO do this refer
@@ -52,7 +52,13 @@ void Edge::initEdge()
 /*TODO: Send port number for port number for management functions*/
 int Edge::RegisterWithShadowNet(std::string ip,uint16_t port, std::string location, uint16_t managementPort)
 {
+  MessageCreator msgCreator;
+  MessageParser msgParser;
   uint8_t recvbuffer [MAX_BUFFER_SIZE];
+  /*Ignored for now, can be used in the future to improve security*/
+  std::string ipResponse;
+  uint16_t portResponse;
+
   uint8_t * message;
   uint16_t length;
   uint8_t msgType;
@@ -64,7 +70,7 @@ int Edge::RegisterWithShadowNet(std::string ip,uint16_t port, std::string locati
     c_sock = new ClientSocketUdp(ip,port);
     message = msgCreator.getMessage(length);
     c_sock->send(message,length);
-    length = (uint16_t)c_sock->recv(recvbuffer,MAX_BUFFER_SIZE);
+    length = (uint16_t)c_sock->recv(recvbuffer,MAX_BUFFER_SIZE,ipResponse,portResponse);
   }
   catch(Exception& ex)
   {
@@ -82,7 +88,13 @@ int Edge::RegisterWithShadowNet(std::string ip,uint16_t port, std::string locati
 /*Gets Edge Parameters from shadownet*/
 int Edge::getEdgeConfigParams(EdgeConfigParams * params)
 {
+  MessageCreator msgCreator;
+  MessageParser msgParser;
   uint8_t recvbuffer [MAX_BUFFER_SIZE];
+    /*Ignored for now, can be used in the future to improve security*/
+  std::string ip;
+  uint16_t port;
+
   uint8_t * message;
   uint16_t length;
   uint8_t msgType;
@@ -93,7 +105,7 @@ int Edge::getEdgeConfigParams(EdgeConfigParams * params)
   {
     message = msgCreator.getMessage(length);
     c_sock->send(message,length);
-    length = (uint16_t)c_sock->recv(recvbuffer,MAX_BUFFER_SIZE);
+    length = (uint16_t)c_sock->recv(recvbuffer,MAX_BUFFER_SIZE,ip,port);
   }
   catch(Exception& ex)
   {
@@ -118,6 +130,8 @@ int Edge::getEdgeConfigParams(EdgeConfigParams * params)
 /*Sends Sampling parameters to the ShadowNet*/
 int Edge::sendSamplingParams(SamplingParams * params)
 {
+  MessageCreator msgCreator;
+  MessageParser msgParser;
   uint8_t * message;
   uint16_t length;
   msgCreator.setMessageType(SEND_SAMPLES);

@@ -10,18 +10,19 @@ ShadowNet::ShadowNet(std::string ip, uint16_t port) :
   maxEdgeRegistered = 0;
 }
 
-int ShadowNet::startShadowNet()
+
+void ShadowNet::ShadowNetMain()
 {
-  /* On receipt of packet give it to processPacket on a new thread*/
+
+}
+
+int ShadowNet::StartShadowNet()
+{
+ 	/*Spawn a thread to ShadowNetMain*/
+  
   return 0;
 }
 
-int ShadowNet::registerEdge(std::string loc)
-{
-  maxEdgeRegistered ++;
-
-  return 0;
-}
 EdgeConfigParams ShadowNet::getParams(uint32_t edgeNum)
 {
   return eConf;
