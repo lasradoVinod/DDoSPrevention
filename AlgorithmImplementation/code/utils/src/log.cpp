@@ -39,10 +39,10 @@ Logger::~Logger()
 
 void Logger::log(char  const * str,int lvl)
 {
-  if ((uint8_t)lvl <= WARN_LEVEL)
+  if ((uint8_t)lvl <= WARN_LEVEL && CURR_LEVEL < WARN_LEVEL)
   {
     std::cout << str << std::endl;
-    if ((uint8_t)lvl < DEBUG_LEVEL)
+    if ((uint8_t)lvl < DEBUG_LEVEL && CURR_LEVEL < DEBUG_LEVEL)
     {
       logFile << "LOG: " << str << std::endl;
       return;

@@ -6,9 +6,7 @@
 #include <event2/event.h>
 #include <vector>
 #include <thread>
-
-/*Most generic callback that can be created.*/
-typedef void * (*callback) (void *);
+#include <functional>
 
 class Timer
 {
@@ -17,7 +15,7 @@ private:
 	struct event_base *base;
 public:
 	Timer();
-	struct event * createTimer(uint32_t ms,callback function);
+	struct event * createTimer(uint32_t ms,event_callback_fn function, void * );
 	void stopTimer(struct event * ev);
 	~Timer();
 };

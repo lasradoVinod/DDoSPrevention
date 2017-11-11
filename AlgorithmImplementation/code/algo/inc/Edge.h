@@ -5,6 +5,7 @@
 #include "AlgoTypes.h"
 #include <list>
 #include <mutex>
+#include <memory>
 
 #include "ClientSocketTCP.h"
 #include "ServerSocketTCP.h"
@@ -13,6 +14,18 @@
 
 #ifndef EDGE_H
 	#define EDGE_H
+
+#define TIMER_SAMPLER       0x10
+#define TIMER_SEND_SAMPLER  0x11
+#define TIMER_GET_PARAMS    0x12
+
+class Edge;
+
+typedef struct __derefHelper
+{
+  uint8_t type;
+  Edge * edge;
+}derefHelper;
 
 class SamplingHelper
 {
@@ -28,13 +41,14 @@ class Process
 {
 private:
   /*When this is false, delete it*/
-  bool connected;
   EdgeState eState;
-  uint32_t dataRecieved;
   ServerSocketTcp m_serv_sock;
   ClientSocketTcp m_client_sock;
-  std::mutex lock;
 public:
+  bool connected;
+  std::mutex m_lock;
+  uint32_t dataRecieved;
+
   Process(ServerSocketTcp sock,EdgeState state,std::string cloudip, uint16_t cloudport);
 	/*This is the server's main loop for one connection*/
 	void ProcessLoop();
@@ -44,7 +58,7 @@ public:
 class Edge
 {
 public:
-	Edge(uint16_t port);
+	Edge(uint16_t port, std::string cloudIP, uint16_t cloudport);
 	/*Not storing this information.
 	Connect with the ShadowNet once
 	Store edgeNumber returned
@@ -62,12 +76,7 @@ public:
 	/*This is a friend function that is used in case of alarms
 	 * I don't want to use it, but I can't figure out a way to avoid it
 	 * with the current design that I have chosen*/
-  friend void SendAlarmPacket(ShadowPacket);
-private:	
-  /*Gets Edge Parameters from shadownet*/
-  int getEdgeConfigParams(EdgeConfigParams * params);
-  /*Sends Sampling parameters to the ShadowNet*/
-  int sendSamplingParams(SamplingParams * params);
+  friend void SendAlarmPacket(Edge *,ShadowPacket);
 
   /*The following functions are timer callbacks*/
 
@@ -76,16 +85,50 @@ private:
   /*This function handles sampling at each instance*/
   void getSample();
   /*This function sends the sampling data*/
-	void sendSample();
+  void sendSample();
 
+private:
+  /*Gets Edge Parameters from shadownet*/
+  int getEdgeConfigParams(EdgeConfigParams * params);
+  /*Sends Sampling parameters to the ShadowNet*/
+  int sendSamplingParams(SamplingParams * params);
+
+	Timer timerBase;
+
+	std::string cloudIpAddr;
+	uint16_t cloudIpPortNum;
+	/*Timers for various functions*/
+	struct event * samplingTimer;
+	struct event * samplingDurationTimer;
+	struct event * samplingSendTimer;
+
+	derefHelper sampTimStruct;
+	derefHelper sampDurationTimStruct;
+	derefHelper sampSendStruct;
+	/*Lock for accessing */
+	std::mutex edgeParamsLock;
+	/*Lock for accessing average parameter*/
+	std::mutex averageLock;
+	/*Lock for messing with pro*/
+	std::mutex processLock;
+	/*current average*/
 	average_t datarateAverage;
-  	uint16_t port;
-	ClientSocketUdp * c_sock;
+  uint16_t port;
+	std::unique_ptr<ClientSocketUdp> c_sock;
+	/*My socket*/
+	std::unique_ptr<ServerSocketTcp> tcpServSock;
+	/*Edge number assigned by the shadownet server*/
 	uint32_t myEdgeNum;
+	/*Current average*/
 	SamplingParams sampleParams;
+	/*Current edge parameters*/
 	EdgeConfigParams edgeParams;
-	std::list <Process> pro;
+	/*List of processes*/
+	std::list <Process *> pro;
+	/*The state of the current edge*/
 	EdgeState eState;
 };
+
+
 
 #endif
