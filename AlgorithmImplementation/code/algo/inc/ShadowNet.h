@@ -3,6 +3,8 @@
 #include <string>
 #include <mutex>
 #include <list>
+#include <thread>
+#include <memory>
 
 #include "AlgoTypes.h"
 #include "MessageHelper.h"
@@ -50,8 +52,10 @@ private:
   std::map <uint32_t,std::mutex> edgeLocMapMutex;
   ServerSocketUdp servSock;
   std::mutex mapLock; 
+  std::unique_ptr<std::thread> mainLoopThread;
+  bool mainStatus;
   /*Update the appropriate paramets in the EdgeParams structure*/
-  void processPacket(uint8_t * data, uint32_t size);
+  void processPacket(uint8_t * data, uint16_t size , std::string ip, uint16_t port);
   EdgeConfigParams getParams(uint32_t edgeNum);
   void ShadowNetMain();
 public:

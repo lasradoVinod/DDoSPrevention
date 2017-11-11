@@ -11,7 +11,7 @@
 #include <string>
 #include <arpa/inet.h>
 
-#define MAXRECV_UDP  1024
+#define MAXRECV_UDP  256
 
 class SocketUdp
 {
@@ -22,7 +22,7 @@ class SocketUdp
 
   // Server initialization
   bool create();
-  bool bind ( const char * ip, const uint16_t port );
+  bool bind ( std::string ip, const uint16_t port );
   bool accept ( SocketUdp& ) const;
 
   // Client initialization

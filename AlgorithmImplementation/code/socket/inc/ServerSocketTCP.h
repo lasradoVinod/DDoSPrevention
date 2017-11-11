@@ -10,7 +10,7 @@ class ServerSocketTcp : private SocketTcp
 {
  public:
 
-  ServerSocketTcp ( uint16_t port );
+  ServerSocketTcp (std::string ip, uint16_t port );
   ServerSocketTcp (){};
   virtual ~ServerSocketTcp();
 

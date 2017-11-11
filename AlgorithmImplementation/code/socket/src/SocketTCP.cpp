@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <SocketTCP.h>
 #include <iostream>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 
@@ -48,7 +49,7 @@ bool SocketTcp::create()
 
 
 
-bool SocketTcp::bind ( const uint16_t port )
+bool SocketTcp::bind (std::string ip, const uint16_t port )
 {
 
   if ( ! is_valid() )
@@ -56,10 +57,8 @@ bool SocketTcp::bind ( const uint16_t port )
       return false;
     }
 
-
-
   m_addr.sin_family = AF_INET;
-  m_addr.sin_addr.s_addr = INADDR_ANY;
+  inet_aton(ip.c_str(),&(m_addr.sin_addr));
   m_addr.sin_port = htons ( port );
 
   int bind_return = ::bind ( m_sock,

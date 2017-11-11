@@ -5,14 +5,14 @@
 #include "exception.hpp"
 
 
-ServerSocketTcp::ServerSocketTcp ( uint16_t port )
+ServerSocketTcp::ServerSocketTcp (std::string ip, uint16_t port )
 {
   if ( ! SocketTcp::create() )
     {
       throw Exception ( "Could not create server socket.",2 );
     }
 
-  if ( ! SocketTcp::bind ( port ) )
+  if ( ! SocketTcp::bind (ip, port ) )
     {
       throw Exception ( "Could not bind to port.", 2);
     }

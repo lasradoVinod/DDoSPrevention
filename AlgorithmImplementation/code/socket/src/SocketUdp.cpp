@@ -43,7 +43,7 @@ bool SocketUdp::create()
 
 }
 
-bool SocketUdp::bind ( const char * ip, const uint16_t port )
+bool SocketUdp::bind ( std::string ip, const uint16_t port )
 {
 
   if ( ! is_valid() )
@@ -52,7 +52,7 @@ bool SocketUdp::bind ( const char * ip, const uint16_t port )
     }
 
   m_addr.sin_family = AF_INET;
-  inet_aton(ip,&(m_addr.sin_addr));
+  inet_aton(ip.c_str(),&(m_addr.sin_addr));
   m_addr.sin_port = htons ( port );
 
   int bind_return = ::bind ( m_sock,

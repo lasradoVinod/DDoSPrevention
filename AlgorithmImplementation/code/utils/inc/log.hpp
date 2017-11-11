@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <fstream>
+#include <mutex>
 
 #ifndef CURR_LEVEL
   #define CURR_LEVEL  3
@@ -18,6 +19,7 @@ class Logger
 	private:
 		static Logger* instance;
 		std::ofstream logFile;
+		std::mutex fileLock;
 		Logger();
 
 	public:

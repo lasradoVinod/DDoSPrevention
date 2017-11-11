@@ -10,7 +10,7 @@ class ServerSocketUdp : private SocketUdp
 {
  public:
 
-  ServerSocketUdp (const char* ip, uint16_t port );
+  ServerSocketUdp (std::string ip, uint16_t port );
   virtual ~ServerSocketUdp();
 
   const ServerSocketUdp& operator << ( const std::string& ) const;

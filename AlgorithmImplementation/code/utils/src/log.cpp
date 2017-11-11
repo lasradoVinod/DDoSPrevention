@@ -39,6 +39,7 @@ Logger::~Logger()
 
 void Logger::log(char  const * str,int lvl)
 {
+  fileLock.lock();
   if ((uint8_t)lvl <= WARN_LEVEL && CURR_LEVEL < WARN_LEVEL)
   {
     std::cout << str << std::endl;
@@ -55,4 +56,5 @@ void Logger::log(char  const * str,int lvl)
     std::cerr << str << std::endl;
     logFile << "ERR: " << str << std::endl;
   }
+  fileLock.unlock();
 }

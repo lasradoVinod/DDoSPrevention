@@ -113,8 +113,10 @@ alpha_t SamplingHelper::getAlpha()
 	return alpha;
 }
 
-Edge::Edge(uint16_t pt, std::string cip, uint16_t cpn)
+Edge::Edge(std::string mIp,uint16_t pt, std::string cip, uint16_t cpn)
 {
+  manPort = MANAGEMENT_PORT;
+  myIp = mIp;
   sampTimStruct = {TIMER_SAMPLER,this};
   sampDurationTimStruct = {TIMER_GET_PARAMS,this};
   sampSendStruct = {TIMER_SEND_SAMPLER,this};
@@ -131,36 +133,47 @@ Edge::Edge(uint16_t pt, std::string cip, uint16_t cpn)
 
 void Edge::initEdge()
 {
-  Logger * log = Logger::getInstance();
-  log->log("Getting Params",DEBUG_LEVEL);
-  getEdgeConfigParams(&edgeParams);
-  log->log("Got Params",DEBUG_LEVEL);
-
-  log->log("Starting Timer for sampling",DEBUG_LEVEL);
-  samplingTimer = timerBase.createTimer(edgeParams.samplingTime,(event_callback_fn)dereferencer,(void *)&sampTimStruct);
-  log->log("Created Timer for sampling",DEBUG_LEVEL);
-
-  log->log("Starting Timer for Send Sampling",DEBUG_LEVEL);
-  samplingSendTimer = timerBase.createTimer(edgeParams.sampleSendTime,(event_callback_fn)dereferencer,(void *)&sampSendStruct);
-  log->log("Created Timer for Send Sampling",DEBUG_LEVEL);
-
-  log->log("Starting Timer for Duration",DEBUG_LEVEL);
-  samplingDurationTimer = timerBase.createTimer(edgeParams.samplingDuration,(event_callback_fn)dereferencer,(void *)&sampDurationTimStruct);
-  log->log("Created Timer for Duration",DEBUG_LEVEL);
-
-
-  std::unique_ptr<ServerSocketTcp> temp (new ServerSocketTcp(port));
-  tcpServSock = std::move(temp);
-  while(1)
+  try
   {
-    ServerSocketTcp * accepted;
-    Process * tempProcess;
-    tcpServSock->accept(*accepted);
-    tempProcess = new Process(*accepted,eState,cloudIpAddr,cloudIpPortNum);
-    processLock.lock();
-    pro.push_back(tempProcess);
-    processLock.unlock();
-    std::thread t(&Process::ProcessLoop,tempProcess);
+    Logger * log = Logger::getInstance();
+    log->log("Getting Params",DEBUG_LEVEL);
+    getEdgeConfigParams(&edgeParams);
+    log->log("Got Params",DEBUG_LEVEL);
+
+    log->log("Starting Timer for sampling",DEBUG_LEVEL);
+    samplingTimer = timerBase.createTimer(edgeParams.samplingTime,(event_callback_fn)dereferencer,(void *)&sampTimStruct);
+    log->log("Created Timer for sampling",DEBUG_LEVEL);
+
+    log->log("Starting Timer for Send Sampling",DEBUG_LEVEL);
+    samplingSendTimer = timerBase.createTimer(edgeParams.sampleSendTime,(event_callback_fn)dereferencer,(void *)&sampSendStruct);
+    log->log("Created Timer for Send Sampling",DEBUG_LEVEL);
+
+    log->log("Starting Timer for Duration",DEBUG_LEVEL);
+    samplingDurationTimer = timerBase.createTimer(edgeParams.samplingDuration,(event_callback_fn)dereferencer,(void *)&sampDurationTimStruct);
+    log->log("Created Timer for Duration",DEBUG_LEVEL);
+
+    log->log("Creating Port for management functions",DEBUG_LEVEL);
+    std::unique_ptr<ServerSocketUdp> tempPtrMan (new ServerSocketUdp(myIp,manPort));
+    manageSock = std::move(tempPtrMan);
+
+    std::unique_ptr<ServerSocketTcp> temp (new ServerSocketTcp(myIp, port));
+    tcpServSock = std::move(temp);
+    while(1)
+    {
+      ServerSocketTcp * accepted;
+      Process * tempProcess;
+      tcpServSock->accept(*accepted);
+      tempProcess = new Process(*accepted,eState,cloudIpAddr,cloudIpPortNum);
+      processLock.lock();
+      pro.push_back(tempProcess);
+      processLock.unlock();
+      std::thread t(&Process::ProcessLoop,tempProcess);
+    }
+  }
+  catch(Exception &e)
+  {
+    std::cerr << e.getMessage() << std::endl;
+    exit(0);
   }
 }
 
@@ -184,6 +197,7 @@ int Edge::RegisterWithShadowNet(std::string ip,uint16_t port, std::string locati
   {
     std::unique_ptr<ClientSocketUdp> tempPtr (new ClientSocketUdp(ip,port));
     c_sock = std::move(tempPtr);
+
     message = msgCreator.getMessage(length);
     c_sock->send(message,length);
     length = (uint16_t)c_sock->recv(recvbuffer,MAX_BUFFER_SIZE,ipResponse,portResponse);
@@ -287,13 +301,18 @@ void Process::ProcessLoop()
 {
   uint8_t buffer[MAXRECV_TCP] = {0};
   uint32_t length;
+
   try
   {
-    length = m_serv_sock.recv(buffer,MAXRECV_TCP);
-    m_lock.lock();
-    dataRecieved += length;
-    m_lock.unlock();
-    m_client_sock.send(buffer,length);
+    while(1)
+    {
+      length = m_serv_sock.recv(buffer,MAXRECV_TCP);
+      m_lock.lock();
+      dataRecieved += length;
+      m_lock.unlock();
+      m_client_sock.send(buffer,length);
+
+    }
   }
   catch(Exception &e)
   {

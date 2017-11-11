@@ -15,6 +15,7 @@
 #ifndef EDGE_H
 	#define EDGE_H
 
+#define MANAGEMENT_PORT     51927
 #define TIMER_SAMPLER       0x10
 #define TIMER_SEND_SAMPLER  0x11
 #define TIMER_GET_PARAMS    0x12
@@ -58,7 +59,7 @@ public:
 class Edge
 {
 public:
-	Edge(uint16_t port, std::string cloudIP, uint16_t cloudport);
+	Edge(std::string myIp, uint16_t port, std::string cloudIP, uint16_t cloudport);
 	/*Not storing this information.
 	Connect with the ShadowNet once
 	Store edgeNumber returned
@@ -94,7 +95,12 @@ private:
   int sendSamplingParams(SamplingParams * params);
 
 	Timer timerBase;
-
+	/*This is my Ip Address and portNumber*/
+	std::string myIp;
+	uint16_t port;
+	/*Management port Number*/
+	uint16_t manPort;
+	/*This is the ipAddress that I communicate with the clound*/
 	std::string cloudIpAddr;
 	uint16_t cloudIpPortNum;
 	/*Timers for various functions*/
@@ -113,10 +119,11 @@ private:
 	std::mutex processLock;
 	/*current average*/
 	average_t datarateAverage;
-  uint16_t port;
 	std::unique_ptr<ClientSocketUdp> c_sock;
 	/*My socket*/
 	std::unique_ptr<ServerSocketTcp> tcpServSock;
+	/*This is the management port that the ShadowNet sends messages to */
+	std::unique_ptr<ServerSocketUdp> manageSock;
 	/*Edge number assigned by the shadownet server*/
 	uint32_t myEdgeNum;
 	/*Current average*/

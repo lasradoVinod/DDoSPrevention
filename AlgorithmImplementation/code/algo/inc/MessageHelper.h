@@ -10,16 +10,17 @@
 #define MAX_BUFFER_SIZE     128
 
 /*Following macros define the message type*/
-#define ERROR_MESSAGE       0x00
+#define ERROR_MESSAGE            0x00u
 /*Registration of edge with ShadowNet*/
-#define REGISTER            0x01u
+#define REGISTER                 0x01u
 /*Get Sampling parameters*/
-#define GET_PARAMS          0x02u
+#define GET_PARAMS               0x02u
 /*Send Aggregated Values*/
-#define SEND_SAMPLES        0x03u
+#define SEND_SAMPLES             0x03u
 /*Alarm ShadowNet Packets*/
-#define ALARM_PACKETS       0x04u
+#define ALARM_PACKETS            0x04u
 /*GENERIC FOR UNDEFINED*/
+#define REGISTER_MANAGEMENT_PORT 0x05u
 #define UNDEFINED           0xFFFFFFFFu
 
 

@@ -22,7 +22,7 @@ class SocketTcp
 
   // Server initialization
   bool create();
-  bool bind ( const uint16_t port );
+  bool bind ( std::string ip, const uint16_t port );
   bool listen() const;
   bool accept ( SocketTcp& ) const;
 

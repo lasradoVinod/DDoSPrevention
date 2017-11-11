@@ -4,7 +4,7 @@
 #include "exception.hpp"
 
 
-ServerSocketUdp::ServerSocketUdp (const char* ip, uint16_t port )
+ServerSocketUdp::ServerSocketUdp (std::string ip, uint16_t port )
 {
   if ( ! SocketUdp::create() )
     {
