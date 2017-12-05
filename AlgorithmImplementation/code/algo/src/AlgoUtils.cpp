@@ -1,39 +1,88 @@
 #include "AlgoUtils.h"
+#include <sys/time.h>
+#include <signal.h>
+#include <map>
+#include <iostream>
+#include "log.hpp"
 
-void eventLoop(event_base * base)
+std::map<timer_t,callBackInfo> Timer::timerMap;
+
+void timerHandler(int sig, siginfo_t *si, void *uc)
 {
-	event_base_dispatch(base);
+  Logger * log = Logger::getInstance();
+  timer_t tidp;
+
+  log->log("In timer handler",DEBUG_LEVEL);
+  tidp = si->si_value.sival_ptr;
+
+  std::map<timer_t,callBackInfo>::iterator it;
+  it = Timer::timerMap.find(tidp);
+
+  log->log("Calling function",DEBUG_LEVEL);
+  (it->second).func((it->second).arg);
+  log->log("Back in timer handler",DEBUG_LEVEL);
 }
 
 Timer::Timer()
 {
-	base = event_base_new();
-	numTimers = 0;
 }
 
-struct event * Timer::createTimer(uint32_t ms,event_callback_fn function,void * object)
+timer_t * Timer::createTimer(uint32_t ms,callback_t function,void * object)
 {
-	struct timeval tv = {0,ms*1000};
-	struct event * ev = event_new(base,-1,EV_TIMEOUT|EV_PERSIST,(event_callback_fn)function,object);
-	event_add(ev,&tv);
-	if (numTimers == 0)
-	{
-		std::thread temp(eventLoop,base);
-		temp.detach();
-	}
-	numTimers ++;
-	return ev;
+  callBackInfo tempInfo = {function,object};
+  timer_t * timerID = new (timer_t);
+  struct sigevent te;
+  struct itimerspec its;
+  struct sigaction sa;
+  int sigNo = SIGRTMIN;
+
+  /* Set up signal handler. */
+  sa.sa_flags = SA_SIGINFO | SA_RESTART;
+  sa.sa_sigaction = timerHandler;
+  sigemptyset(&sa.sa_mask);
+  if (sigaction(sigNo, &sa, NULL) == -1) {
+      perror("sigaction");
+  }
+
+  /* Set and enable alarm */
+  te.sigev_notify = SIGEV_SIGNAL;
+  te.sigev_signo = sigNo;
+  te.sigev_value.sival_ptr = timerID;
+  timer_create(CLOCK_REALTIME, &te, timerID);
+
+  its.it_interval.tv_sec = ms / 1000;
+  its.it_interval.tv_nsec = (ms % 1000) * 1000000;
+  its.it_value.tv_sec = ms / 1000;
+  its.it_value.tv_nsec = (ms % 1000) * 1000000;
+  timer_settime(*timerID, 0, &its, NULL);
+
+  timerMap.insert(std::pair<timer_t,callBackInfo>(timerID,tempInfo));
+  return timerID;
 }
 
-void Timer::stopTimer(struct event * ev)
+void reset_timer(timer_t * timer_id)
 {
-	if (numTimers == 1)
-		event_base_loopbreak(base);
-	event_del(ev);
-	numTimers --;
+    struct itimerspec ts;
+    ts.it_value.tv_sec = 0;
+    ts.it_value.tv_nsec = 0;
+    ts.it_interval.tv_sec = 0;
+    ts.it_interval.tv_nsec = 0;
+    if (timer_settime(*timer_id, 0, &ts, NULL) == -1){
+            std::cerr << "errno code: " << errno;
+            exit (0);
+    }
+}
+
+void Timer::stopTimer(timer_t * ev)
+{
+  std::map<timer_t,callBackInfo>::iterator it;
+  it = Timer::timerMap.find(ev);
+  reset_timer(ev);
+  timer_delete(*ev);
+  timerMap.erase(it);
 }
 
 Timer::~Timer()
 {
-	event_base_loopbreak(base);
+  /*TODO delete all timers from map*/
 }

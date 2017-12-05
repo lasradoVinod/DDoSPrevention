@@ -61,8 +61,8 @@ const void ServerSocket::send ( const unsigned char * s, int size )
 
 const int ServerSocket::recv ( unsigned char * s , int size ) 
 {
-  int readSize;
-  if ( (readSize = Socket::recv ( s,size )) )
+  int readSize = Socket::recv ( s,size );
+  if ( readSize < 0 )
     {
       throw Exception ( "Could not read from socket.",2 );
     }

@@ -42,8 +42,8 @@ class CSNHelper():
 	def __init__(self):
 		self.cbw = 10 #Mbps
 		self.sbw = 10 #Mbps
-		self.cdly = 10 #ms
-		self.sdly = 5 #ms
+		self.cdly = 50 #ms
+		self.sdly = 25 #ms
 
 	def SetCloudBandwidth(self,val):
 		self.cbw = val

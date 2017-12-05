@@ -14,6 +14,13 @@
 #define MESSAGE_EDGENUM_OFFSET  1u
 #define MESSAGE_LENGTH_OFFSET   5u
 
+Message::Message()
+{
+  length = 0;
+  messageType = ERROR_MESSAGE;
+  edgeNum = UNDEFINED;
+
+}
 int Message::getLength(uint16_t * len)
 {
   *len = length;

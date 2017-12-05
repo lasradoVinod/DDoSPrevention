@@ -46,7 +46,7 @@ typedef struct __attribute__((packed)) __SamplingParams
   /*Connection time*/
 	average_t ConnectionTime;
 #endif
-	/*Number of packets*/
+	/*Data Received*/
 	average_t inputPackets;
 }SamplingParams;
 
@@ -57,10 +57,13 @@ typedef enum
   enStateAlarm
 }EdgeState;
 
-typedef struct __ShadowPacket
+typedef struct __attribute__((packed)) __ShadowPacket
 {
+  /*This is not implemented for lack of time*/
+#if 0
   struct sockaddr_in sock;
-  uint32_t size;
+#endif
+  uint16_t size;
 }ShadowPacket;
 
 #endif

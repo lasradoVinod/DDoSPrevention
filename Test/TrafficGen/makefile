@@ -9,12 +9,13 @@ CXFLAGS = -Wall -Wconversion -O3 -std=c++11
 CXFLAGS += -MD -MP -MF .dep/$(@F).d
 
 LIBDIR = 
-LIB = 
+LIB = event pthread
 SRC = ClientSocket.cpp \
 	ServerSocket.cpp \
 	Socket.cpp \
 	exception.cpp \
-	log.cpp 
+	log.cpp \
+	AlgoUtils.cpp
 
 INC = .
 
@@ -25,7 +26,10 @@ INCS  = $(patsubst %,-I%,$(INC))
 
 .PHONY: clean
 
-all: sink bulk onOff random
+all: sink bulk onOff random cloud randomTest
+
+randomTest: $(OBJS) $(OBJDIR)/randomTest.o 
+	$(CC) $(CXFLAGS) $(OBJS) $(OBJDIR)/randomTest.o $(INCS) $(LIBDIRS) -o randomTest $(LIBS)
 
 sink: $(OBJS) $(OBJDIR)/sink.o 
 	$(CC) $(CXFLAGS) $(OBJS) $(OBJDIR)/sink.o $(INCS) $(LIBDIRS) -o sink $(LIBS)
@@ -39,6 +43,8 @@ onOff: $(OBJS) $(OBJDIR)/onOffSend.o
 random: $(OBJS) $(OBJDIR)/randomSend.o 
 	$(CC) $(CXFLAGS) $(OBJS) $(OBJDIR)/randomSend.o $(INCS) $(LIBDIRS) -o random $(LIBS)
 		
+cloud: $(OBJS) $(OBJDIR)/cloudDetection.o 
+	$(CC) $(CXFLAGS) $(OBJS) $(OBJDIR)/cloudDetection.o $(INCS) $(LIBDIRS) -o $@ $(LIBS)
 debug:
 	@echo $(VPATH)
 clean:

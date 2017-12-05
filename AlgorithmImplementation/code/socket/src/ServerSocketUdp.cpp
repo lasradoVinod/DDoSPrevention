@@ -36,7 +36,7 @@ const ServerSocketUdp& ServerSocketUdp::operator << ( const std::string& s ) con
 
 const ServerSocketUdp& ServerSocketUdp::operator >> ( std::string& s ) const
 {
-  if ( ! SocketUdp::recv ( s ) )
+  if ( SocketUdp::recv ( s ) == -1 )
     {
       throw Exception ( "Could not read from socket.",2 );
     }
@@ -56,7 +56,8 @@ const void ServerSocketUdp::send ( const unsigned char * s, int size )
 const int ServerSocketUdp::recv ( unsigned char * s , int size, std::string & ip, uint16_t &port) 
 {
   int readSize;
-  if ( (readSize = SocketUdp::recv ( s,size,ip,port )) )
+  readSize = SocketUdp::recv ( s,size,ip,port );
+  if ( readSize == -1 )
     {
       throw Exception ( "Could not read from socket.",2 );
     }

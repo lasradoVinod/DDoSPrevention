@@ -9,11 +9,11 @@ CXFLAGS = -Wall -Wconversion -std=c++11 -g
 CXFLAGS += -MD -MP -MF .dep/$(@F).d
 
 LIBDIR = 
-LIB = event pthread
+LIB = rt pthread
 SRC = 
 VPATH = . 
 INC = 
-DEBU = CURR_LEVEL=3
+DEBU = CURR_LEVEL=0
 #*************Including UTILS**************************
 include $(ROOT)/code/utils/utils.mak
 #******************************************************
@@ -34,18 +34,18 @@ DEBUG = $(patsubst %,-D%,$(DEBU))
 
 .PHONY: clean
 
-all: edgeMain SNMain
+all: edge shadownet
 
-edgeMain: $(OBJS) $(OBJDIR)/edgeMain.o 
-	$(CC) $(CXFLAGS) $(OBJS) $(DEBUG) $(OBJDIR)/edgeMain.o $(INCS) $(LIBDIRS) -o edgeMain $(LIBS)
+edge: $(OBJS) $(OBJDIR)/edgeMain.o 
+	$(CC) $(CXFLAGS) $(OBJS) $(DEBUG) $(OBJDIR)/edgeMain.o $(INCS) $(LIBDIRS) -o edge $(LIBS)
 
-SNMain: $(OBJS) $(OBJDIR)/SNMain.o 
-	$(CC) $(CXFLAGS) $(OBJS) $(DEBUG) $(OBJDIR)/SNMain.o $(INCS) $(LIBDIRS) -o SNMain $(LIBS)
+shadownet: $(OBJS) $(OBJDIR)/SNMain.o 
+	$(CC) $(CXFLAGS) $(OBJS) $(DEBUG) $(OBJDIR)/SNMain.o $(INCS) $(LIBDIRS) -o shadownet $(LIBS)
 	
 debug:
 	@echo $(VPATH)
 clean:
-	rm $(ROOT)/obj/* SNMain edgeMain
+	rm $(ROOT)/obj/* edge shadownet
 
 $(OBJDIR)/%.o: %.cpp
 	@echo Compiling $@ $< ...

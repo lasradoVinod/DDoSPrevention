@@ -9,6 +9,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <netinet/tcp.h>
 
 
 SocketTcp::SocketTcp() :
@@ -42,7 +43,9 @@ bool SocketTcp::create()
   if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR, ( const char* ) &on, sizeof ( on ) ) == -1 )
     return false;
 
-
+  int i;
+  if ( setsockopt( m_sock, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i)) == -1 )
+      return false;
   return true;
 
 }
@@ -97,10 +100,12 @@ bool SocketTcp::listen() const
 bool SocketTcp::accept ( SocketTcp& new_socket ) const
 {
   int addr_length = sizeof ( m_addr );
-  new_socket.m_sock = ::accept ( m_sock, ( sockaddr * ) &m_addr, ( socklen_t * ) &addr_length );
-
+  new_socket.m_sock = ::accept ( m_sock, ( sockaddr * ) &(new_socket.m_addr), ( socklen_t * ) &addr_length );
   if ( new_socket.m_sock <= 0 )
+  {
+    std::cerr << errno << std::endl;
     return false;
+  }
   else
     return true;
 }

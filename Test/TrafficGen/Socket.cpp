@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
-
+#include <netinet/tcp.h>
 
 Socket::Socket() :
   m_sock ( -1 )
@@ -39,6 +39,10 @@ bool Socket::create()
   // TIME_WAIT - argh
   int on = 1;
   if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR, ( const char* ) &on, sizeof ( on ) ) == -1 )
+    return false;
+
+  int i;
+  if ( setsockopt( m_sock, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i)) == -1 )
     return false;
 
 

@@ -19,8 +19,11 @@
 #define SEND_SAMPLES             0x03u
 /*Alarm ShadowNet Packets*/
 #define ALARM_PACKETS            0x04u
-/*GENERIC FOR UNDEFINED*/
+/*Register the port Number of management port*/
 #define REGISTER_MANAGEMENT_PORT 0x05u
+/*Change to normal state*/
+#define CHANGE_TO_NORMAL         0x06u
+/*GENERIC FOR UNDEFINED*/
 #define UNDEFINED           0xFFFFFFFFu
 
 
@@ -38,6 +41,7 @@ protected:
   uint32_t edgeNum;
   uint8_t buffer[MAX_BUFFER_SIZE] = {0};
 public:
+  Message();
   int getLength(uint16_t *);
   int setMessageType(uint8_t);
   int setEdgeNumber(uint32_t);
